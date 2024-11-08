@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Classifier</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #0d0d0d;
+            color: #00ffea;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Matrix Effect */
+        .matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            background-color: rgba(26, 26, 26, 0.9);
+            box-shadow: 0 8px 16px rgba(0, 255, 234, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #00ffea;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #00ffea;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 8px rgba(0, 255, 234, 0.8);
+        }
+
+        p {
+            color: #99ffff;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 1px solid #00ffea;
+            border-radius: 5px;
+            background-color: #0d0d0d;
+            color: #00ffea;
+            resize: none;
+            height: 120px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-group textarea:focus {
+            box-shadow: 0 0 12px rgba(0, 255, 234, 0.6);
+            outline: none;
+        }
+
+        .btn {
+            background-color: #00ffea;
+            color: #0d0d0d;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #33ffff;
+            transform: scale(1.05);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            font-size: 1.25rem;
+            color: #00ffea;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 255, 234, 0.8);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: #99ffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Matrix Background Effect -->
+    <canvas class="matrix"></canvas>
+
+    <div class="container">
+        <h1>Review Classifier</h1>
+        <p>Enter a review below, and we'll tell you if it's real or fake!</p>
+
+        <form action="/predict" method="post">
+            <div class="form-group">
+                <textarea name="review" placeholder="Type your review here..." required></textarea>
+            </div>
+            <button type="submit" class="btn">Classify Review</button>
+        </form>
+
+
+        <!-- Display prediction result -->
+        {% if prediction_text %}
+        <div class="result">{{ prediction_text }}</div>
+        {% endif %}
+
+
+
+        <div class="footer">
+            <p>Made by Jatin Mishra</p>
+        </div>
+    </div>
+
+    <!-- JavaScript for Matrix Background -->
+    <script>
+        const canvas = document.querySelector('.matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const columns = canvas.width / 20; // Number of columns
+        const rainDrops = Array.from({ length: columns }, () => 1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ffea';
+            ctx.font = '20px "Share Tech Mono"';
+
+            rainDrops.forEach((y, index) => {
+                const text = Math.random() > 0.5 ? '1' : '0';
+                const x = index * 20;
+                ctx.fillText(text, x, y * 20);
+
+                if (y * 20 > canvas.height && Math.random() > 0.975) {
+                    rainDrops[index] = 0;
+                }
+                rainDrops[index]++;
+            });
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+
+</html>
